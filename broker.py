@@ -26,7 +26,7 @@ def root():
     # Add resource parameter to existing query
     if resource != "":
         logger.info("Estableciendo query string")
-        active_session = active_session + "?" + urlencode({"resource" : resource })
+        active_session = active_session + "?resource=" + resource
 
     logger.info("Redirijiendo")
     return redirect(active_session)
