@@ -3,7 +3,7 @@
 from sessions.open_refine import  get_session, new_session
 
 from flask import Flask, request, redirect
-from urllib import urlencode
+from urllib import urlencode, quote
 from urlparse import urlparse
 
 import logging
@@ -14,10 +14,8 @@ app = Flask(__name__)
 
 @app.route("/")
 def root():
-    resource = request.args.get("resource", "")
-
-    encode_url = urlencode(request.args)
-
+    resource = request.args.get("resource", "") 
+    
     ip = request.remote_addr
     logger.info("Verificando sesion activa a %s" % ip)
     active_session = get_session(ip)
@@ -28,8 +26,15 @@ def root():
 
     # Add resource parameter to existing query
     if resource != "":
-        logger.info("Estableciendo query string")
-        active_session = active_session + "?" + encode_url
+      query = request.args.copy()
+      
+      for key, value in query.items():
+        if key != "resource":
+          query["resource"] += "&" + key + "=" + value
+          del query[key]
+
+      logger.info("Estableciendo query string")
+      active_session = active_session + "?" + urlencode(query)
 
     logger.info("Redirijiendo")
     return redirect(active_session)
