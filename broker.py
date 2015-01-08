@@ -16,9 +16,7 @@ app = Flask(__name__)
 def root():
     resource = request.args.get("resource", "")
 
-    query = request.args.copy()
-    if resource != "":
-        del query["resource"]
+    encode_url = urlencode(request.args)
 
     ip = request.remote_addr
     logger.info("Verificando sesion activa a %s" % ip)
@@ -31,7 +29,7 @@ def root():
     # Add resource parameter to existing query
     if resource != "":
         logger.info("Estableciendo query string")
-        active_session = active_session + "?resource=" + resource + "&" + urlencode(query)
+        active_session = active_session + "?" + encode_url
 
     logger.info("Redirijiendo")
     return redirect(active_session)
